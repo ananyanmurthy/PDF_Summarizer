@@ -1,59 +1,178 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PDF Summarizer</title>
-<style>
-:root{--accent:#6c63ff}
-body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial; padding:24px; background:#f7f7fb}
-.card{max-width:900px;margin:24px auto;padding:20px;background:white;border-radius:12px;box-shadow:0 6px 18px rgba(20,20,50,0.08)}
-h1{margin:0 0 8px 0}
-.row{display:flex;gap:12px;align-items:center}
-input[type=file]{display:block}
-textarea{width:100%;height:260px;margin-top:12px;padding:12px;border-radius:8px;border:1px solid #e6e6f0}
-.controls{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
-.btn{background:var(--accent);color:white;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
-.btn.secondary{background:#eee;color:#222}
-.meta{color:#666;font-size:14px}
-.small{font-size:13px;color:#444}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI PDF Summarizer</title>
+  <style>
+    :root { --bg:#0b0c10;--panel:#11131a;--accent:#7c5cff;--accent-2:#00d3a7;--muted:#b8c1cc;--text:#e6edf3;--danger:#ff5d5d;--ok:#2ecc71;--border:#1e2230;--shadow:0 10px 30px rgba(0,0,0,.35);--radius:18px;}
+    *{box-sizing:border-box}body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";color:var(--text);background:radial-gradient(1200px 600px at 20% -10%,rgba(124,92,255,.18),transparent 60%),radial-gradient(1200px 700px at 120% 20%,rgba(0,211,167,.15),transparent 60%),var(--bg);min-height:100vh;display:grid;place-items:center;padding:40px 20px}.wrap{width:min(1100px,96vw)}.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.card-header{padding:18px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(124,92,255,.10),transparent)}.title{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.3px}.badge{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid #3a3f55;color:var(--muted)}.card-body{padding:22px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px}.row{display:contents}.field{background:#0f1424;border:1px solid #1f2a44;border-radius:14px;padding:14px}.label{font-size:12px;letter-spacing:.4px;color:#9fb0c7;margin-bottom:8px;display:flex;align-items:center;gap:8px;text-transform:uppercase}.num{width:22px;height:22px;display:inline-grid;place-items:center;border-radius:50%;background:#171e33;border:1px solid #2a3147;color:var(--accent);font-weight:700;font-size:12px;flex:0 0 22px}.file-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}input[type="text"],select,textarea{width:100%;background:#0b1124;border:1px solid #243155;color:var(--text);padding:12px 12px;border-radius:12px;outline:none;font-size:14px}textarea{min-height:170px;resize:vertical}.btn{appearance:none;border:0;cursor:pointer;padding:12px 14px;border-radius:12px;font-weight:700;background:var(--accent);color:white;box-shadow:0 6px 20px rgba(124,92,255,.35)}.btn.secondary{background:#243155;box-shadow:none}.btn.ghost{background:transparent;border:1px solid #324162;color:var(--muted);box-shadow:none}.btn:disabled{opacity:.5;cursor:not-allowed}.inline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.chip{display:inline-flex;align-items:center;gap:8px;background:#10172a;border:1px solid #223055;color:#9fb0c7;padding:8px 10px;border-radius:999px;font-size:13px;font-weight:600}.dot{width:8px;height:8px;border-radius:50%;background:var(--danger)}.dot.ok{background:var(--ok)}.footer{padding:16px 22px;display:flex;gap:10px;border-top:1px solid var(--border);background:linear-gradient(0deg,rgba(0,211,167,.10),transparent)}.grow{flex:1}@media(max-width:920px){.grid{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
-<div class="card">
-<h1>PDF Summarizer</h1>
-<div class="meta">Upload a PDF, choose <strong>short / medium / long</strong> summary. If your system is offline the app will use the offline model automatically.</div>
-
-
-<div style="margin-top:16px">
-<label class="small">Select PDF</label>
-<input id="pdffile" type="file" accept="application/pdf">
-<div class="small" id="file-name"></div>
+<div class="wrap">
+<section class="card" role="form" aria-label="AI Summarizer">
+<header class="card-header">
+<div class="title">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+<path d="M4 6a2 2 0 0 1 2-2h7l5 5v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z" stroke="currentColor" stroke-width="1.5"/>
+<path d="M13 4v4a2 2 0 0 0 2 2h4" stroke="currentColor" stroke-width="1.5"/>
+</svg>
+<div>AI Summarizer for PDF</div>
+<span class="badge" id="modeBadge">Mode: Detecting…</span>
 </div>
-
-
-<div class="controls">
-<div>
-<label class="small">Summary length</label><br/>
-<select id="length">
-<option value="short">Short</option>
-<option value="medium" selected>Medium</option>
-<option value="long">Long</option>
+<div class="inline">
+<span class="chip"><span class="dot" id="netDot"></span><span id="netText">Checking connection…</span></span>
+</div>
+</header>
+<div class="card-body">
+<div class="grid">
+<div class="row">
+<div class="field">
+<div class="label"><span class="num">1</span> File Path</div>
+<div class="file-row">
+<input id="filePath" type="text" placeholder="C:/MyData/filename.pdf" autocomplete="off" />
+<input id="fileInput" type="file" accept="application/pdf" hidden />
+<button class="btn secondary" id="browseBtn" type="button">Browse</button>
+</div>
+</div>
+<div class="field">
+<div class="label"><span class="num">2</span> Mode</div>
+<select id="modelSelect" aria-label="Model">
+  <option value="online">Online</option>
+  <option value="offline">Offline</option>
 </select>
 </div>
-
-
-<div>
-<label class="small">Mode</label><br/>
-<select id="mode">
-<option value="auto">Auto (online if available)</option>
-<option value="online">Force Online</option>
-<option value="offline">Force Offline</option>
-</select>
+</div>
+<div class="row">
+<div class="field">
+<div class="label"><span class="num">3</span> Summary Length</div>
+<div class="inline" role="radiogroup" aria-label="Summary length">
+<label class="chip"><input type="radio" name="len" value="short" checked /> Short</label>
+<label class="chip"><input type="radio" name="len" value="medium" /> Medium</label>
+<label class="chip"><input type="radio" name="len" value="long" /> Long</label>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="field">
+<div class="label"><span class="num">4</span> Load / Process</div>
+<div class="inline">
+<button class="btn" id="summarizeBtn" type="button">Summarize</button>
+<button class="btn ghost" id="clearBtn" type="button">Clear</button>
+</div>
+</div>
+<div class="field">
+<div class="label"><span class="num">5</span> Output File Name</div>
+<input id="outPath" type="text" placeholder="filename_summary.txt (browser will download)" />
+</div>
+</div>
+<div class="row">
+<div class="field" style="grid-column: 1 / -1;">
+<div class="label"><span class="num">6</span> Summary (Text)</div>
+<textarea id="summaryBox" placeholder="The generated summary will appear here…"></textarea>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<div class="grow"></div>
+<button class="btn secondary" id="copyBtn" type="button">Copy</button>
+<button class="btn" id="downloadBtn" type="button">Download Output</button>
+</div>
+</section>
 </div>
 
+<script>
+const filePath = document.getElementById('filePath');
+const fileInput = document.getElementById('fileInput');
+const browseBtn = document.getElementById('browseBtn');
+const summarizeBtn = document.getElementById('summarizeBtn');
+const clearBtn = document.getElementById('clearBtn');
+const outPath = document.getElementById('outPath');
+const summaryBox = document.getElementById('summaryBox');
+const copyBtn = document.getElementById('copyBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const modelSelect = document.getElementById('modelSelect');
 
-<div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-<button class="btn" id="summarizeBtn">Summarize</button>
-<button class="btn secondary" id="clearBtn">Clear</button>
+browseBtn.addEventListener('click',()=>fileInput.click());
+fileInput.addEventListener('change',()=>{if(fileInput.files?.[0])filePath.value=fileInput.files[0].name;});
+
+const netDot = document.getElementById('netDot');
+const netText = document.getElementById('netText');
+const modeBadge = document.getElementById('modeBadge');
+
+function updateNetworkState(){
+  const online = navigator.onLine;
+  netDot.classList.toggle('ok', online);
+  netText.textContent = online ? 'Online' : 'Offline';
+  const onlineOption = modelSelect.querySelector('option[value="online"]');
+  if(online){
+    onlineOption.disabled = false;
+  } else {
+    onlineOption.disabled = true;
+    modelSelect.value = 'offline';
+  }
+  modeBadge.textContent=`Mode: ${modelSelect.value.charAt(0).toUpperCase() + modelSelect.value.slice(1)}`;
+}
+
+window.addEventListener('online', updateNetworkState);
+window.addEventListener('offline', updateNetworkState);
+updateNetworkState();
+
+const RENDER_BACKEND_URL = "https://your-backend.onrender.com"; // <-- replace this with your deployed backend URL
+
+summarizeBtn.addEventListener('click', async () => {
+  if(!fileInput.files?.[0]){alert('Please choose a PDF.');return;}
+  const length = document.querySelector('input[name="len"]:checked')?.value || 'short';
+  const mode = modelSelect.value;
+
+  summarizeBtn.disabled = true;
+  summarizeBtn.textContent = 'Summarizing…';
+
+  const formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+  formData.append('length', length);
+
+  let url = mode === 'online'
+    ? `${RENDER_BACKEND_URL}/api/summarize/online`
+    : `${RENDER_BACKEND_URL}/api/summarize/offline`;
+
+  try{
+    const res = await fetch(url, { method:'POST', body:formData });
+    const data = await res.json();
+    summaryBox.value = data.summary;
+  }catch(err){
+    summaryBox.value = 'Error: ' + err;
+  }
+
+  summarizeBtn.disabled = false;
+  summarizeBtn.textContent = 'Summarize';
+});
+
+clearBtn.addEventListener('click', ()=>summaryBox.value='');
+
+copyBtn.addEventListener('click', async ()=>{
+  try{
+    await navigator.clipboard.writeText(summaryBox.value);
+    copyBtn.textContent='Copied!';
+    setTimeout(()=>copyBtn.textContent='Copy',1200);
+  }catch(e){alert('Could not copy to clipboard.');}
+});
+
+downloadBtn.addEventListener('click', ()=>{
+  const text = summaryBox.value || '';
+  let name = outPath.value.trim();
+  if (!name) { name = 'summary.txt'; }
+  else if(!name.toLowerCase().endsWith('.txt')){ name += '.txt'; }
+  const blob = new Blob([text], { type:'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
 </html>
